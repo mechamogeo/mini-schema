@@ -1,6 +1,19 @@
-export { BaseType, type SafeParseOptions } from "./base";
+export {
+  BaseType,
+  type SafeParseOptions,
+  OptionalType,
+  NullableType,
+  NullishType,
+  DefaultType,
+  TransformType,
+} from "./base";
 export { StringType } from "./string";
 export { NumberType } from "./number";
 export { BooleanType } from "./boolean";
 export { LiteralType, type LiteralValue } from "./literal";
 export { EnumType } from "./enum";
+export {
+  CoercedStringType,
+  CoercedNumberType,
+  CoercedBooleanType,
+} from "./coerce";

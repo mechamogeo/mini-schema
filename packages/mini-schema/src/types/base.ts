@@ -49,11 +49,6 @@ export abstract class BaseType<TOutput, TInput = TOutput> {
   abstract _parse(value: unknown, ctx: ParseContext): ParseResult<TOutput>;
 
   /**
-   * Clone the type instance - must be implemented by subclasses
-   */
-  abstract _clone(): BaseType<TOutput, TInput>;
-
-  /**
    * Parse a value and throw if invalid
    */
   parse(value: unknown): TOutput {
@@ -116,5 +111,136 @@ export abstract class BaseType<TOutput, TInput = TOutput> {
   protected _mergeErrors(errors: ValidationError[]): ValidationError {
     const allIssues = errors.flatMap((e) => e.issues);
     return new ValidationError(allIssues);
+  }
+
+  /**
+   * Make this schema optional (accept undefined)
+   */
+  optional(): OptionalType<TOutput> {
+    return new OptionalType(this as unknown as BaseType<TOutput>);
+  }
+
+  /**
+   * Make this schema nullable (accept null)
+   */
+  nullable(): NullableType<TOutput> {
+    return new NullableType(this as unknown as BaseType<TOutput>);
+  }
+
+  /**
+   * Make this schema nullish (accept null or undefined)
+   */
+  nullish(): NullishType<TOutput> {
+    return new NullishType(this as unknown as BaseType<TOutput>);
+  }
+
+  /**
+   * Provide a default value when undefined is passed
+   */
+  default(defaultValue: TOutput | (() => TOutput)): DefaultType<TOutput> {
+    return new DefaultType(this as unknown as BaseType<TOutput>, defaultValue);
+  }
+
+  /**
+   * Transform the output value
+   */
+  transform<TNewOutput>(
+    fn: (value: TOutput) => TNewOutput,
+  ): TransformType<TOutput, TNewOutput> {
+    return new TransformType(this as unknown as BaseType<TOutput>, fn);
+  }
+}
+
+/**
+ * Wrapper type that makes the inner type optional
+ */
+export class OptionalType<T> extends BaseType<T | undefined> {
+  constructor(private readonly innerType: BaseType<T>) {
+    super();
+  }
+
+  _parse(value: unknown, ctx: ParseContext): ParseResult<T | undefined> {
+    if (value === undefined) {
+      return { success: true, data: undefined };
+    }
+    return this.innerType._parse(value, ctx) as ParseResult<T | undefined>;
+  }
+}
+
+/**
+ * Wrapper type that makes the inner type nullable
+ */
+export class NullableType<T> extends BaseType<T | null> {
+  constructor(private readonly innerType: BaseType<T>) {
+    super();
+  }
+
+  _parse(value: unknown, ctx: ParseContext): ParseResult<T | null> {
+    if (value === null) {
+      return { success: true, data: null };
+    }
+    return this.innerType._parse(value, ctx) as ParseResult<T | null>;
+  }
+}
+
+/**
+ * Wrapper type that makes the inner type nullish (null | undefined)
+ */
+export class NullishType<T> extends BaseType<T | null | undefined> {
+  constructor(private readonly innerType: BaseType<T>) {
+    super();
+  }
+
+  _parse(value: unknown, ctx: ParseContext): ParseResult<T | null | undefined> {
+    if (value === undefined || value === null) {
+      return { success: true, data: value as null | undefined };
+    }
+    return this.innerType._parse(value, ctx) as ParseResult<
+      T | null | undefined
+    >;
+  }
+}
+
+/**
+ * Wrapper type that provides a default value for undefined
+ */
+export class DefaultType<T> extends BaseType<T> {
+  constructor(
+    private readonly innerType: BaseType<T>,
+    private readonly defaultValue: T | (() => T),
+  ) {
+    super();
+  }
+
+  _parse(value: unknown, ctx: ParseContext): ParseResult<T> {
+    if (value === undefined) {
+      const resolved =
+        typeof this.defaultValue === "function"
+          ? (this.defaultValue as () => T)()
+          : this.defaultValue;
+      return { success: true, data: resolved };
+    }
+    return this.innerType._parse(value, ctx) as ParseResult<T>;
+  }
+}
+
+/**
+ * Wrapper type that transforms the output
+ */
+export class TransformType<TInput, TOutput> extends BaseType<TOutput> {
+  constructor(
+    private readonly innerType: BaseType<TInput>,
+    private readonly transformFn: (value: TInput) => TOutput,
+  ) {
+    super();
+  }
+
+  _parse(value: unknown, ctx: ParseContext): ParseResult<TOutput> {
+    const result = this.innerType._parse(value, ctx);
+    if (!result.success) {
+      return result as ParseResult<TOutput>;
+    }
+    const transformed = this.transformFn(result.data);
+    return { success: true, data: transformed };
   }
 }
