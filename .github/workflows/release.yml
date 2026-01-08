@@ -20,6 +20,7 @@ jobs:
     permissions:
       contents: write
       pull-requests: write
+      packages: write # Required for GitHub Packages
       id-token: write # Required for npm provenance
       attestations: write # Required for GitHub attestations
 
@@ -110,6 +111,27 @@ jobs:
           provenance: true
           access: public
 
+      # Publish to GitHub Packages
+      - name: Setup Node.js for GitHub Packages
+        if: steps.changesets.outputs.hasChangesets == 'false'
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22.x
+          registry-url: "https://npm.pkg.github.com"
+          scope: "@schemini"
+
+      - name: Publish @schemini/core to GitHub Packages
+        if: steps.publish_core.outputs.type
+        run: npm publish ./packages/core --access public
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Publish @schemini/locale to GitHub Packages
+        if: steps.publish_locale.outputs.type
+        run: npm publish ./packages/locale --access public
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
       # Create GitHub Release for @schemini/core
       - name: Create GitHub Release for @schemini/core
         if: steps.publish_core.outputs.type
@@ -189,4 +211,4 @@ jobs:
             echo "- @schemini/locale@${{ steps.publish_locale.outputs.version }} (${{ steps.publish_locale.outputs.type }})" >> $GITHUB_STEP_SUMMARY
           fi
           echo "" >> $GITHUB_STEP_SUMMARY
-          echo "All packages published with npm provenance enabled." >> $GITHUB_STEP_SUMMARY
+          echo "All packages published with npm provenance enabled and to GitHub Packages." >> $GITHUB_STEP_SUMMARY
