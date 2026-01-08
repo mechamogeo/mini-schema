@@ -66,3 +66,14 @@ export {
   type NumberFormat,
   type PhoneNumber,
 } from './validators';
+
+// JSON Schema
+export {
+  toJsonSchema,
+  fromJsonSchema,
+  type JsonSchema,
+  type JsonSchemaType,
+  type JsonSchemaFormat,
+  type ToJsonSchemaOptions,
+  JSON_SCHEMA_DRAFT,
+} from './json-schema';
