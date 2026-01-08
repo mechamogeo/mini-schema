@@ -1,5 +1,5 @@
-import { BaseType } from "./base";
-import type { ParseResult, ParseContext } from "../errors/types";
+import type { ParseContext, ParseResult } from '../errors/types';
+import { BaseType } from './base';
 
 /**
  * Primitive types that can be used as literals
@@ -20,14 +20,10 @@ export class LiteralType<T extends LiteralValue> extends BaseType<T> {
   _parse(input: unknown, ctx: ParseContext): ParseResult<T> {
     if (input !== this.value) {
       return this._createError(ctx, {
-        code: "invalid_literal",
+        code: 'invalid_literal',
         expected: String(this.value),
         received:
-          input === null
-            ? "null"
-            : typeof input === "undefined"
-              ? "undefined"
-              : String(input),
+          input === null ? 'null' : typeof input === 'undefined' ? 'undefined' : String(input),
       });
     }
 

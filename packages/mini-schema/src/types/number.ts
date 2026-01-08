@@ -1,9 +1,5 @@
-import { BaseType } from "./base";
-import type {
-  ParseResult,
-  ParseContext,
-  ErrorMessageOptions,
-} from "../errors/types";
+import type { ErrorMessageOptions, ParseContext, ParseResult } from '../errors/types';
+import { BaseType } from './base';
 
 interface NumberTypeOptions {
   isInt?: boolean | undefined;
@@ -31,15 +27,11 @@ export class NumberType extends BaseType<number> {
   }
 
   _parse(value: unknown, ctx: ParseContext): ParseResult<number> {
-    if (
-      typeof value !== "number" ||
-      Number.isNaN(value) ||
-      !Number.isFinite(value)
-    ) {
+    if (typeof value !== 'number' || Number.isNaN(value) || !Number.isFinite(value)) {
       return this._createError(ctx, {
-        code: "invalid_type",
-        expected: "number",
-        received: value === null ? "null" : typeof value,
+        code: 'invalid_type',
+        expected: 'number',
+        received: value === null ? 'null' : typeof value,
       });
     }
 
@@ -48,9 +40,9 @@ export class NumberType extends BaseType<number> {
     // Check integer
     if (isInt && !Number.isInteger(value)) {
       return this._createError(ctx, {
-        code: "invalid_type",
-        expected: "integer",
-        received: "float",
+        code: 'invalid_type',
+        expected: 'integer',
+        received: 'float',
         message: customMessages.int,
       });
     }
@@ -58,9 +50,9 @@ export class NumberType extends BaseType<number> {
     // Check minimum
     if (minimum !== undefined && value < minimum) {
       return this._createError(ctx, {
-        code: "too_small",
+        code: 'too_small',
         minimum,
-        expected: "number",
+        expected: 'number',
         message: customMessages.min,
       });
     }
@@ -68,9 +60,9 @@ export class NumberType extends BaseType<number> {
     // Check maximum
     if (maximum !== undefined && value > maximum) {
       return this._createError(ctx, {
-        code: "too_big",
+        code: 'too_big',
         maximum,
-        expected: "number",
+        expected: 'number',
         message: customMessages.max,
       });
     }

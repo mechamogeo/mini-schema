@@ -1,1 +1,1 @@
-export { PATTERNS, type PatternName } from "./patterns";
+export { PATTERNS, type PatternName } from './patterns';

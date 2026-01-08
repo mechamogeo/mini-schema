@@ -1,12 +1,8 @@
-import { BaseType } from "./base";
-import { PATTERNS } from "../validators/patterns";
-import type {
-  ParseResult,
-  ParseContext,
-  ErrorMessageOptions,
-} from "../errors/types";
+import type { ErrorMessageOptions, ParseContext, ParseResult } from '../errors/types';
+import { PATTERNS } from '../validators/patterns';
+import { BaseType } from './base';
 
-type StringFormat = "email" | "uuid" | "date" | "datetime" | "cep";
+type StringFormat = 'email' | 'uuid' | 'date' | 'datetime' | 'cep';
 
 interface StringTypeOptions {
   minLength?: number | undefined;
@@ -40,23 +36,22 @@ export class StringType extends BaseType<string> {
   }
 
   _parse(value: unknown, ctx: ParseContext): ParseResult<string> {
-    if (typeof value !== "string") {
+    if (typeof value !== 'string') {
       return this._createError(ctx, {
-        code: "invalid_type",
-        expected: "string",
-        received: value === null ? "null" : typeof value,
+        code: 'invalid_type',
+        expected: 'string',
+        received: value === null ? 'null' : typeof value,
       });
     }
 
-    const { minLength, maxLength, pattern, customValidators, customMessages } =
-      this.options;
+    const { minLength, maxLength, pattern, customValidators, customMessages } = this.options;
 
     // Check min length
     if (minLength !== undefined && value.length < minLength) {
       return this._createError(ctx, {
-        code: "too_small",
+        code: 'too_small',
         minimum: minLength,
-        expected: "string",
+        expected: 'string',
         message: customMessages.min,
       });
     }
@@ -64,9 +59,9 @@ export class StringType extends BaseType<string> {
     // Check max length
     if (maxLength !== undefined && value.length > maxLength) {
       return this._createError(ctx, {
-        code: "too_big",
+        code: 'too_big',
         maximum: maxLength,
-        expected: "string",
+        expected: 'string',
         message: customMessages.max,
       });
     }
@@ -74,8 +69,8 @@ export class StringType extends BaseType<string> {
     // Check pattern
     if (pattern && !pattern.test(value)) {
       return this._createError(ctx, {
-        code: "invalid_string",
-        expected: this.options.format ?? "pattern",
+        code: 'invalid_string',
+        expected: this.options.format ?? 'pattern',
         message: customMessages.pattern,
       });
     }
@@ -84,7 +79,7 @@ export class StringType extends BaseType<string> {
     for (const validator of customValidators) {
       if (!validator.validate(value)) {
         return this._createError(ctx, {
-          code: "custom",
+          code: 'custom',
           message: validator.message,
         });
       }
@@ -152,7 +147,7 @@ export class StringType extends BaseType<string> {
    */
   email(opts?: ErrorMessageOptions): StringType {
     const clone = this.pattern(PATTERNS.email, opts);
-    clone.options.format = "email";
+    clone.options.format = 'email';
     return clone;
   }
 
@@ -161,7 +156,7 @@ export class StringType extends BaseType<string> {
    */
   uuid(opts?: ErrorMessageOptions): StringType {
     const clone = this.pattern(PATTERNS.uuid, opts);
-    clone.options.format = "uuid";
+    clone.options.format = 'uuid';
     return clone;
   }
 
@@ -170,7 +165,7 @@ export class StringType extends BaseType<string> {
    */
   date(opts?: ErrorMessageOptions): StringType {
     const clone = this.pattern(PATTERNS.date, opts);
-    clone.options.format = "date";
+    clone.options.format = 'date';
     return clone;
   }
 
@@ -179,7 +174,7 @@ export class StringType extends BaseType<string> {
    */
   datetime(opts?: ErrorMessageOptions): StringType {
     const clone = this.pattern(PATTERNS.datetime, opts);
-    clone.options.format = "datetime";
+    clone.options.format = 'datetime';
     return clone;
   }
 
@@ -193,10 +188,7 @@ export class StringType extends BaseType<string> {
   /**
    * Add custom validator
    */
-  refine(
-    validate: (value: string) => boolean,
-    opts?: ErrorMessageOptions,
-  ): StringType {
+  refine(validate: (value: string) => boolean, opts?: ErrorMessageOptions): StringType {
     const clone = this._clone();
     clone.options.customValidators.push({
       validate,

@@ -1,5 +1,5 @@
-import { BaseType } from "./base";
-import type { ParseResult, ParseContext } from "../errors/types";
+import type { ParseContext, ParseResult } from '../errors/types';
+import { BaseType } from './base';
 
 /**
  * Schema type for enum validation
@@ -17,14 +17,10 @@ export class EnumType<
   _parse(input: unknown, ctx: ParseContext): ParseResult<T[number]> {
     if (!this.options.includes(input as T[number])) {
       return this._createError(ctx, {
-        code: "invalid_enum",
+        code: 'invalid_enum',
         options: this.options as unknown as string[],
         received:
-          input === null
-            ? "null"
-            : typeof input === "undefined"
-              ? "undefined"
-              : String(input),
+          input === null ? 'null' : typeof input === 'undefined' ? 'undefined' : String(input),
       });
     }
 

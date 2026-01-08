@@ -1,11 +1,11 @@
-export { ValidationError } from "./validation-error";
+export { ValidationError } from './validation-error';
 export {
   defaultErrorMap,
   setErrorMap,
   getErrorMap,
   resetErrorMap,
   getErrorMessage,
-} from "./messages";
+} from './messages';
 export type {
   Issue,
   IssueCode,
@@ -13,4 +13,4 @@ export type {
   ErrorMessageOptions,
   ParseResult,
   ParseContext,
-} from "./types";
+} from './types';

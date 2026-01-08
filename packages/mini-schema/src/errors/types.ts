@@ -2,18 +2,18 @@
  * Issue codes for validation errors
  */
 export type IssueCode =
-  | "invalid_type"
-  | "too_small"
-  | "too_big"
-  | "invalid_string"
-  | "invalid_enum"
-  | "invalid_literal"
-  | "invalid_union"
-  | "unrecognized_keys"
-  | "invalid_arguments"
-  | "invalid_return_type"
-  | "invalid_date"
-  | "custom";
+  | 'invalid_type'
+  | 'too_small'
+  | 'too_big'
+  | 'invalid_string'
+  | 'invalid_enum'
+  | 'invalid_literal'
+  | 'invalid_union'
+  | 'unrecognized_keys'
+  | 'invalid_arguments'
+  | 'invalid_return_type'
+  | 'invalid_date'
+  | 'custom';
 
 /**
  * Represents a single validation issue
@@ -48,7 +48,7 @@ export interface ErrorMessageOptions {
  */
 export type ParseResult<T> =
   | { success: true; data: T }
-  | { success: false; error: import("./validation-error").ValidationError };
+  | { success: false; error: import('./validation-error').ValidationError };
 
 /**
  * Context passed during parsing
