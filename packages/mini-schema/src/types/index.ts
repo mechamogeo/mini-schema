@@ -12,6 +12,7 @@ export { NumberType } from "./number";
 export { BooleanType } from "./boolean";
 export { LiteralType, type LiteralValue } from "./literal";
 export { EnumType } from "./enum";
+export { ObjectType, type Shape, type InferShape } from "./object";
 export {
   CoercedStringType,
   CoercedNumberType,

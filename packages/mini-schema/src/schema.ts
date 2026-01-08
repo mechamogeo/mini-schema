@@ -3,6 +3,7 @@ import { NumberType } from "./types/number";
 import { BooleanType } from "./types/boolean";
 import { LiteralType, type LiteralValue } from "./types/literal";
 import { EnumType } from "./types/enum";
+import { ObjectType, type Shape } from "./types/object";
 import {
   CoercedStringType,
   CoercedNumberType,
@@ -59,6 +60,11 @@ export const s = {
   enum: <T extends readonly [string | number, ...(string | number)[]]>(
     options: T,
   ) => new EnumType(options),
+
+  /**
+   * Create an object schema
+   */
+  object: <T extends Shape>(shape: T) => new ObjectType(shape),
 
   /**
    * Coercion helpers - convert values to the target type
