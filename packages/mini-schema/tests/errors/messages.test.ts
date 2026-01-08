@@ -1,105 +1,105 @@
-import { describe, it, expect, beforeEach, afterEach } from "vitest";
+import { afterEach, describe, expect, it } from 'vitest';
 import {
   defaultErrorMap,
-  setErrorMap,
   getErrorMap,
   resetErrorMap,
-} from "../../src/errors/messages";
-import type { Issue } from "../../src/errors/types";
+  setErrorMap,
+} from '../../src/errors/messages';
+import type { Issue } from '../../src/errors/types';
 
-describe("Error Messages", () => {
+describe('Error Messages', () => {
   afterEach(() => {
     resetErrorMap();
   });
 
-  describe("defaultErrorMap", () => {
-    it("should format invalid_type error", () => {
+  describe('defaultErrorMap', () => {
+    it('should format invalid_type error', () => {
       const issue: Issue = {
-        code: "invalid_type",
+        code: 'invalid_type',
         path: [],
-        message: "",
-        expected: "string",
-        received: "number",
+        message: '',
+        expected: 'string',
+        received: 'number',
       };
 
       const message = defaultErrorMap(issue);
 
-      expect(message).toBe("Expected string, received number");
+      expect(message).toBe('Expected string, received number');
     });
 
-    it("should format too_small error for string", () => {
+    it('should format too_small error for string', () => {
       const issue: Issue = {
-        code: "too_small",
+        code: 'too_small',
         path: [],
-        message: "",
+        message: '',
         minimum: 3,
-        expected: "string",
+        expected: 'string',
       };
 
       const message = defaultErrorMap(issue);
 
-      expect(message).toContain("3");
-      expect(message.toLowerCase()).toContain("character");
+      expect(message).toContain('3');
+      expect(message.toLowerCase()).toContain('character');
     });
 
-    it("should format too_big error", () => {
+    it('should format too_big error', () => {
       const issue: Issue = {
-        code: "too_big",
+        code: 'too_big',
         path: [],
-        message: "",
+        message: '',
         maximum: 10,
-        expected: "string",
+        expected: 'string',
       };
 
       const message = defaultErrorMap(issue);
 
-      expect(message).toContain("10");
+      expect(message).toContain('10');
     });
 
-    it("should format invalid_string error", () => {
+    it('should format invalid_string error', () => {
       const issue: Issue = {
-        code: "invalid_string",
+        code: 'invalid_string',
         path: [],
-        message: "",
-        expected: "email",
+        message: '',
+        expected: 'email',
       };
 
       const message = defaultErrorMap(issue);
 
-      expect(message.toLowerCase()).toContain("email");
+      expect(message.toLowerCase()).toContain('email');
     });
 
-    it("should format invalid_enum error", () => {
+    it('should format invalid_enum error', () => {
       const issue: Issue = {
-        code: "invalid_enum",
+        code: 'invalid_enum',
         path: [],
-        message: "",
-        options: ["a", "b", "c"],
-        received: "d",
+        message: '',
+        options: ['a', 'b', 'c'],
+        received: 'd',
       };
 
       const message = defaultErrorMap(issue);
 
-      expect(message).toContain("a");
-      expect(message).toContain("b");
-      expect(message).toContain("c");
+      expect(message).toContain('a');
+      expect(message).toContain('b');
+      expect(message).toContain('c');
     });
 
-    it("should format custom error", () => {
+    it('should format custom error', () => {
       const issue: Issue = {
-        code: "custom",
+        code: 'custom',
         path: [],
-        message: "Custom validation failed",
+        message: 'Custom validation failed',
       };
 
       const message = defaultErrorMap(issue);
 
-      expect(message).toBe("Custom validation failed");
+      expect(message).toBe('Custom validation failed');
     });
   });
 
-  describe("setErrorMap", () => {
-    it("should allow setting custom error map", () => {
+  describe('setErrorMap', () => {
+    it('should allow setting custom error map', () => {
       const customMap = (issue: Issue) => `Custom: ${issue.code}`;
 
       setErrorMap(customMap);
@@ -107,25 +107,25 @@ describe("Error Messages", () => {
       expect(getErrorMap()).toBe(customMap);
     });
 
-    it("should use custom map for message generation", () => {
-      const customMap = () => "All errors are the same";
+    it('should use custom map for message generation', () => {
+      const customMap = () => 'All errors are the same';
 
       setErrorMap(customMap);
       const currentMap = getErrorMap();
 
       const issue: Issue = {
-        code: "invalid_type",
+        code: 'invalid_type',
         path: [],
-        message: "",
+        message: '',
       };
 
-      expect(currentMap(issue)).toBe("All errors are the same");
+      expect(currentMap(issue)).toBe('All errors are the same');
     });
   });
 
-  describe("resetErrorMap", () => {
-    it("should reset to default error map", () => {
-      setErrorMap(() => "custom");
+  describe('resetErrorMap', () => {
+    it('should reset to default error map', () => {
+      setErrorMap(() => 'custom');
       resetErrorMap();
 
       expect(getErrorMap()).toBe(defaultErrorMap);
