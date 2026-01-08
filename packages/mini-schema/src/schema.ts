@@ -1,3 +1,4 @@
+import { type ToJsonSchemaOptions, fromJsonSchema, toJsonSchema } from './json-schema';
 import { ArrayType } from './types/array';
 import type { BaseType } from './types/base';
 import { BooleanType } from './types/boolean';
@@ -80,6 +81,26 @@ export const s = {
    * Coercion helpers - convert values to the target type
    */
   coerce,
+
+  /**
+   * Convert a mini-schema to JSON Schema
+   *
+   * @example
+   * const userSchema = s.object({ name: s.string() });
+   * const jsonSchema = s.toJsonSchema(userSchema);
+   * // { type: 'object', properties: { name: { type: 'string' } }, required: ['name'] }
+   */
+  toJsonSchema: (schema: BaseType<unknown>, options?: ToJsonSchemaOptions) =>
+    toJsonSchema(schema, options),
+
+  /**
+   * Create a mini-schema from JSON Schema
+   *
+   * @example
+   * const jsonSchema = { type: 'string', minLength: 1 };
+   * const schema = s.fromJsonSchema(jsonSchema);
+   */
+  fromJsonSchema,
 } as const;
 
 /**
