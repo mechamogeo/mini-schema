@@ -58,6 +58,36 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
+      # Pack tarballs for attestation before publishing
+      - name: Pack @schemini/core
+        if: steps.changesets.outputs.hasChangesets == 'false'
+        run: |
+          cd packages/core
+          npm pack
+          mv *.tgz ../../schemini-core.tgz
+
+      - name: Pack @schemini/locale
+        if: steps.changesets.outputs.hasChangesets == 'false'
+        run: |
+          cd packages/locale
+          npm pack
+          mv *.tgz ../../schemini-locale.tgz
+
+      # Generate GitHub attestations for the tarballs
+      - name: Attest @schemini/core
+        id: attest_core
+        if: steps.changesets.outputs.hasChangesets == 'false'
+        uses: actions/attest-build-provenance@v2
+        with:
+          subject-path: ./schemini-core.tgz
+
+      - name: Attest @schemini/locale
+        id: attest_locale
+        if: steps.changesets.outputs.hasChangesets == 'false'
+        uses: actions/attest-build-provenance@v2
+        with:
+          subject-path: ./schemini-locale.tgz
+
       # Publish @schemini/core with provenance
       - name: Publish @schemini/core
         id: publish_core
@@ -80,19 +110,6 @@ jobs:
           provenance: true
           access: public
 
-      # Generate attestations for GitHub
-      - name: Attest @schemini/core
-        if: steps.publish_core.outputs.type
-        uses: actions/attest-build-provenance@v2
-        with:
-          subject-path: ./packages/core
-
-      - name: Attest @schemini/locale
-        if: steps.publish_locale.outputs.type
-        uses: actions/attest-build-provenance@v2
-        with:
-          subject-path: ./packages/locale
-
       # Create GitHub Release for @schemini/core
       - name: Create GitHub Release for @schemini/core
         if: steps.publish_core.outputs.type
@@ -108,15 +125,26 @@ jobs:
             changelog=$(git log --pretty=format:"- %s (%h)" --no-merges | head -20)
           fi
 
-          # Create release
+          # Rename tarball for release
+          TARBALL="schemini-core-${VERSION}.tgz"
+          cp schemini-core.tgz "$TARBALL"
+
+          # Create release with tarball
           gh release create "$TAG" \
             --title "$TAG" \
             --notes "## What's Changed
 
           ${changelog}
 
+          ## Verification
+
+          This release includes npm provenance attestations and GitHub attestations.
+          - [View attestations](https://github.com/${{ github.repository }}/attestations)
+          - [npm package](https://www.npmjs.com/package/@schemini/core/v/${VERSION})
+
           **Full Changelog**: https://github.com/${{ github.repository }}/compare/${last_tag}...${TAG}" \
-            --target ${{ github.sha }} || echo "Release may already exist"
+            --target ${{ github.sha }} \
+            "$TARBALL" || echo "Release may already exist"
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
@@ -127,15 +155,25 @@ jobs:
           VERSION="${{ steps.publish_locale.outputs.version }}"
           TAG="@schemini/locale@${VERSION}"
 
-          # Create release (simpler since it usually releases with core)
+          # Rename tarball for release
+          TARBALL="schemini-locale-${VERSION}.tgz"
+          cp schemini-locale.tgz "$TARBALL"
+
+          # Create release with tarball
           gh release create "$TAG" \
             --title "$TAG" \
             --notes "## @schemini/locale v${VERSION}
 
           Released alongside @schemini/core.
 
-          **npm**: https://www.npmjs.com/package/@schemini/locale/v/${VERSION}" \
-            --target ${{ github.sha }} || echo "Release may already exist"
+          ## Verification
+
+          This release includes npm provenance attestations and GitHub attestations.
+          - [View attestations](https://github.com/${{ github.repository }}/attestations)
+          - [npm package](https://www.npmjs.com/package/@schemini/locale/v/${VERSION})
+          " \
+            --target ${{ github.sha }} \
+            "$TARBALL" || echo "Release may already exist"
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
