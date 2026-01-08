@@ -25,7 +25,8 @@
     "LICENSE"
   ],
   "scripts": {
-    "build": "tsc",
+    "build": "tsup",
+    "build:tsc": "tsc",
     "test": "vitest run",
     "test:watch": "vitest",
     "test:coverage": "vitest run --coverage",
@@ -53,6 +54,7 @@
     "node": ">=20.0.0"
   },
   "devDependencies": {
+    "tsup": "^8.5.1",
     "vitest": "^3.2.4"
   },
   "peerDependencies": {
