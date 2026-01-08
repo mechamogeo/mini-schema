@@ -34,7 +34,14 @@ export {
 } from './types';
 
 // Errors
-export { ValidationError, getErrorMessage, defaultErrorMap } from './errors';
+export {
+  ValidationError,
+  getErrorMessage,
+  defaultErrorMap,
+  setErrorMap,
+  getErrorMap,
+  resetErrorMap,
+} from './errors';
 export type {
   Issue,
   IssueCode,

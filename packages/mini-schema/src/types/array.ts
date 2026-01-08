@@ -60,6 +60,7 @@ export class ArrayType<T> extends BaseType<T[]> {
         code: 'too_small',
         minimum: this._exactLength,
         inclusive: true,
+        expected: 'array',
         message: this._lengthMessage ?? `Array must have exactly ${this._exactLength} element(s)`,
       });
     }
@@ -70,6 +71,7 @@ export class ArrayType<T> extends BaseType<T[]> {
         code: 'too_small',
         minimum: this._minLength,
         inclusive: true,
+        expected: 'array',
         message: this._minMessage ?? `Array must have at least ${this._minLength} element(s)`,
       });
     }
@@ -80,6 +82,7 @@ export class ArrayType<T> extends BaseType<T[]> {
         code: 'too_big',
         maximum: this._maxLength,
         inclusive: true,
+        expected: 'array',
         message: this._maxMessage ?? `Array must have at most ${this._maxLength} element(s)`,
       });
     }
