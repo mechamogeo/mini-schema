@@ -1,14 +1,13 @@
-import { StringType } from "./types/string";
-import { NumberType } from "./types/number";
-import { BooleanType } from "./types/boolean";
-import { LiteralType, type LiteralValue } from "./types/literal";
-import { EnumType } from "./types/enum";
-import { ObjectType, type Shape } from "./types/object";
-import {
-  CoercedStringType,
-  CoercedNumberType,
-  CoercedBooleanType,
-} from "./types/coerce";
+import { ArrayType } from './types/array';
+import type { BaseType } from './types/base';
+import { BooleanType } from './types/boolean';
+import { CoercedBooleanType, CoercedNumberType, CoercedStringType } from './types/coerce';
+import { EnumType } from './types/enum';
+import { LiteralType, type LiteralValue } from './types/literal';
+import { NumberType } from './types/number';
+import { ObjectType, type Shape } from './types/object';
+import { StringType } from './types/string';
+import { UnionType } from './types/union';
 
 /**
  * Coercion helpers - convert values to the target type
@@ -57,14 +56,24 @@ export const s = {
   /**
    * Create an enum schema
    */
-  enum: <T extends readonly [string | number, ...(string | number)[]]>(
-    options: T,
-  ) => new EnumType(options),
+  enum: <T extends readonly [string | number, ...(string | number)[]]>(options: T) =>
+    new EnumType(options),
 
   /**
    * Create an object schema
    */
   object: <T extends Shape>(shape: T) => new ObjectType(shape),
+
+  /**
+   * Create an array schema
+   */
+  array: <T>(element: BaseType<T>) => new ArrayType(element),
+
+  /**
+   * Create a union schema (accepts any of the provided schemas)
+   */
+  // biome-ignore lint/suspicious/noExplicitAny: Required for type inference
+  union: <T extends readonly BaseType<any>[]>(options: T) => new UnionType(options),
 
   /**
    * Coercion helpers - convert values to the target type

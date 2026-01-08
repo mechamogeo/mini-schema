@@ -1,11 +1,12 @@
-import { BaseType, OptionalType, DefaultType } from "./base";
-import { ValidationError } from "../errors";
-import type { ParseResult, ParseContext } from "../errors/types";
+import type { ValidationError } from '../errors';
+import type { ParseContext, ParseResult } from '../errors/types';
+import { BaseType, type DefaultType, OptionalType } from './base';
 
 /**
  * Shape definition for object schemas
  */
-export type Shape = Record<string, BaseType<unknown>>;
+// biome-ignore lint/suspicious/noExplicitAny: Required for type compatibility with modifiers
+export type Shape = Record<string, BaseType<any>>;
 
 /**
  * Infer the output type from a shape
@@ -13,13 +14,13 @@ export type Shape = Record<string, BaseType<unknown>>;
 export type InferShape<T extends Shape> = {
   [K in keyof T as T[K] extends OptionalType<unknown> | DefaultType<unknown>
     ? never
-    : K]: T[K]["_output"];
+    : K]: T[K]['_output'];
 } & {
   [K in keyof T as T[K] extends OptionalType<unknown>
     ? K
     : T[K] extends DefaultType<unknown>
       ? K
-      : never]?: T[K]["_output"];
+      : never]?: T[K]['_output'];
 };
 
 /**
@@ -30,38 +31,28 @@ type Flatten<T> = { [K in keyof T]: T[K] };
 /**
  * Behavior for unknown keys
  */
-type UnknownKeysBehavior = "strip" | "strict" | "passthrough";
+type UnknownKeysBehavior = 'strip' | 'strict' | 'passthrough';
 
 /**
  * Schema type for object validation
  */
-export class ObjectType<T extends Shape> extends BaseType<
-  Flatten<InferShape<T>>
-> {
+export class ObjectType<T extends Shape> extends BaseType<Flatten<InferShape<T>>> {
   readonly shape: T;
-  private unknownKeys: UnknownKeysBehavior = "strip";
+  private unknownKeys: UnknownKeysBehavior = 'strip';
 
-  constructor(shape: T, unknownKeys: UnknownKeysBehavior = "strip") {
+  constructor(shape: T, unknownKeys: UnknownKeysBehavior = 'strip') {
     super();
     this.shape = shape;
     this.unknownKeys = unknownKeys;
   }
 
-  _parse(
-    value: unknown,
-    ctx: ParseContext,
-  ): ParseResult<Flatten<InferShape<T>>> {
+  _parse(value: unknown, ctx: ParseContext): ParseResult<Flatten<InferShape<T>>> {
     // Check if value is an object
-    if (typeof value !== "object" || value === null || Array.isArray(value)) {
+    if (typeof value !== 'object' || value === null || Array.isArray(value)) {
       return this._createError(ctx, {
-        code: "invalid_type",
-        expected: "object",
-        received:
-          value === null
-            ? "null"
-            : Array.isArray(value)
-              ? "array"
-              : typeof value,
+        code: 'invalid_type',
+        expected: 'object',
+        received: value === null ? 'null' : Array.isArray(value) ? 'array' : typeof value,
       });
     }
 
@@ -87,20 +78,18 @@ export class ObjectType<T extends Shape> extends BaseType<
     }
 
     // Handle unknown keys
-    if (this.unknownKeys === "strict" || this.unknownKeys === "passthrough") {
+    if (this.unknownKeys === 'strict' || this.unknownKeys === 'passthrough') {
       const shapeKeys = new Set(Object.keys(this.shape));
-      const unknownKeysFound = Object.keys(input).filter(
-        (k) => !shapeKeys.has(k),
-      );
+      const unknownKeysFound = Object.keys(input).filter((k) => !shapeKeys.has(k));
 
-      if (this.unknownKeys === "strict" && unknownKeysFound.length > 0) {
+      if (this.unknownKeys === 'strict' && unknownKeysFound.length > 0) {
         return this._createError(ctx, {
-          code: "unrecognized_keys",
-          message: `Unrecognized keys: ${unknownKeysFound.join(", ")}`,
+          code: 'unrecognized_keys',
+          message: `Unrecognized keys: ${unknownKeysFound.join(', ')}`,
         });
       }
 
-      if (this.unknownKeys === "passthrough") {
+      if (this.unknownKeys === 'passthrough') {
         for (const key of unknownKeysFound) {
           result[key] = input[key];
         }
@@ -121,31 +110,28 @@ export class ObjectType<T extends Shape> extends BaseType<
    * Reject objects with unknown keys
    */
   strict(): ObjectType<T> {
-    return new ObjectType(this.shape, "strict");
+    return new ObjectType(this.shape, 'strict');
   }
 
   /**
    * Allow and pass through unknown keys
    */
   passthrough(): ObjectType<T> {
-    return new ObjectType(this.shape, "passthrough");
+    return new ObjectType(this.shape, 'passthrough');
   }
 
   /**
    * Strip unknown keys (default behavior)
    */
   strip(): ObjectType<T> {
-    return new ObjectType(this.shape, "strip");
+    return new ObjectType(this.shape, 'strip');
   }
 
   /**
    * Extend the schema with additional properties
    */
   extend<U extends Shape>(additional: U): ObjectType<T & U> {
-    return new ObjectType(
-      { ...this.shape, ...additional } as T & U,
-      this.unknownKeys,
-    );
+    return new ObjectType({ ...this.shape, ...additional } as T & U, this.unknownKeys);
   }
 
   /**
@@ -174,7 +160,7 @@ export class ObjectType<T extends Shape> extends BaseType<
    * Make all properties optional
    */
   partial(): ObjectType<{
-    [K in keyof T]: OptionalType<T[K]["_output"]>;
+    [K in keyof T]: OptionalType<T[K]['_output']>;
   }> {
     const partialShape: Record<string, BaseType<unknown>> = {};
     for (const [key, schema] of Object.entries(this.shape)) {
@@ -182,7 +168,7 @@ export class ObjectType<T extends Shape> extends BaseType<
     }
     return new ObjectType(
       partialShape as {
-        [K in keyof T]: OptionalType<T[K]["_output"]>;
+        [K in keyof T]: OptionalType<T[K]['_output']>;
       },
       this.unknownKeys,
     );
@@ -223,9 +209,9 @@ class RequiredWrapper<T> extends BaseType<T> {
   _parse(value: unknown, ctx: ParseContext): ParseResult<T> {
     if (value === undefined) {
       return this._createError(ctx, {
-        code: "invalid_type",
-        expected: "value",
-        received: "undefined",
+        code: 'invalid_type',
+        expected: 'value',
+        received: 'undefined',
       });
     }
     // Parse through the optional (which will accept the value)
