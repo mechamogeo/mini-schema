@@ -1,3 +1,13 @@
+## [@schemini/core-v2.0.0](https://github.com/mechamogeo/schemini/compare/@schemini/core@1.0.0...@schemini/core@2.0.0) (2026-01-10)
+
+### ⚠ BREAKING CHANGES
+
+* Package versions reset to 1.0.x series
+
+### Features
+
+* initial release after migration to semantic-release ([2ae5a78](https://github.com/mechamogeo/schemini/commit/2ae5a78dcb52b55666ad56560220656ce6074740))
+
 ## @schemini/core-v1.0.0 (2026-01-10)
 
 ### Features
