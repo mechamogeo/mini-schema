@@ -65,7 +65,7 @@
     "tsup": "^8.5.1"
   },
   "peerDependencies": {
-    "@schemini/core": ">=1.0.0",
+    "@schemini/core": ">=2.0.0",
     "typescript": ">=5.0.0"
   },
   "peerDependenciesMeta": {
